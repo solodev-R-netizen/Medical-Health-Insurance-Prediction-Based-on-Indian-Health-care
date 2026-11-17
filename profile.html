@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 0; min-height: 100vh; background: white; color: #222; transition: background 0.4s, color 0.4s; }
+        body.dark { background: #111; color: #eee; }
+        nav { background: linear-gradient(90deg, #ff9800, #ff5722); }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px;  color: white; }
+        nav a { color: white; text-decoration: none; margin-left: 15px; font-weight: 500; }
+        .profile-box { width: 90%; max-width: 900px; margin: 20px auto; padding: 30px; background: linear-gradient(145deg, #f0f0f0, #ddd); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: background 0.4s, color 0.4s; }
+        body.dark .profile-box { background: linear-gradient(145deg, #444, #222); color: white; }
+        h2 { text-align: center; margin-bottom: 20px; }
+        .section { margin-bottom: 25px; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .input-group label { font-weight: 500; margin-bottom: 5px; transition: color 0.3s; }
+        .input-group input, .input-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid #aaa; outline: none; font-size: 15px; width: 100%; box-sizing: border-box; }
+        .multi-select { position: relative; border: 1px solid #aaa; border-radius: 8px; padding: 10px; cursor: pointer; background: rgba(255,255,255,0.06); color: inherit; user-select: none; }
+        .multi-select .placeholder { color: #777; }
+        .multi-select .options { display: none; position: absolute; top: 110%; left: 0; width: 100%; max-height: 180px; overflow-y: auto; background: #fff; color: #000; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.2); z-index: 1000; padding: 10px; box-sizing: border-box; }
+        body.dark .multi-select .options { background: #333; color: white; }
+        .multi-select.active .options { display: block; }
+        .multi-select .options label { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; cursor: pointer; font-weight: 500; }
+        .multi-select .options input[type="checkbox"] { margin-left: 10px; }
+        .btn-container { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        button { padding: 12px 20px; background: #ff9800; color: white; font-size: 15px; border: none; border-radius: 8px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #e68900; }
+        .btn-back { background: #999; }
+        .btn-back:hover { background: #666; }
+        .theme-toggle { cursor: pointer; font-size: 24px; margin-left: 15px; }
+    </style>
+</head>
+<body class="light">
+    <nav>
+        <div class="nav-wrapper">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('history') }}">History</a>
+        </div>
+        <div>
+            <span class="theme-toggle" onclick="toggleTheme()">🌙</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+    <div class="profile-box">
+        <h2>Welcome, {{ name }}</h2>
+        <form method="POST" action="/profile">
+            <div class="section">
+                <h3>Personal Details</h3>
+                <div class="input-group"><label>Full Name</label><input type="text" name="name" value="{{ user.name }}"></div>
+                <div class="input-group"><label>Age</label><input type="number" name="age" value="{{ user.age }}"></div>
+                <div class="input-group">
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="" disabled>Select Gender</option>
+                        <option value="Male" {% if user and user.gender=='Male' %}selected{% endif %}>Male</option>
+                        <option value="Female" {% if user and user.gender=='Female' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Marital Status</label>
+                    <select name="marital_status">
+                        <option value="" disabled>Select Status</option>
+                        <option value="Single" {% if user and user.marital_status=='Single' %}selected{% endif %}>Single</option>
+                        <option value="Married" {% if user and user.marital_status=='Married' %}selected{% endif %}>Married</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Region</label>
+                    <select name="region">
+                        <option value="" disabled>Select Region</option>
+                        <option value="Metro" {% if user and user.region=='Metro' %}selected{% endif %}>Metro</option>
+                        <option value="Tier-2" {% if user and user.region=='Tier-2' %}selected{% endif %}>Tier-2</option>
+                        <option value="Rural" {% if user and user.region=='Rural' %}selected{% endif %}>Rural</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section">
+                <h3>Health Details</h3>
+                <div class="input-group"><label>Height (cm)</label><input type="number" step="0.1" name="height" value="{{ user.height }}"></div>
+                <div class="input-group"><label>Weight (kg)</label><input type="number" step="0.1" name="weight" value="{{ user.weight }}"></div>
+                <div class="input-group">
+                    <label>Exercise Level</label>
+                    <select name="exercise">
+                        <option value="" disabled>Select Option</option>
+                        <option value="Low" {% if user and user.exercise=='Low' %}selected{% endif %}>Low</option>
+                        <option value="Moderate" {% if user and user.exercise=='Moderate' %}selected{% endif %}>Moderate</option>
+                        <option value="High" {% if user and user.exercise=='High' %}selected{% endif %}>High</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Alcohol Consumption</label>
+                    <select name="alcohol">
+                        <option value="" disabled>Select Option</option>
+                        <option value="None" {% if user and user.alcohol=='None' %}selected{% endif %}>None</option>
+                        <option value="Occasional" {% if user and user.alcohol=='Occasional' %}selected{% endif %}>Occasional</option>
+                        <option value="Frequent" {% if user and user.alcohol=='Frequent' %}selected{% endif %}>Frequent</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Smoker</label>
+                    <select name="smoker">
+                        <option value="" disabled>Select Option</option>
+                        <option value="Yes" {% if user and user.smoker=='Yes' %}selected{% endif %}>Yes</option>
+                        <option value="No" {% if user and user.smoker=='No' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Diseases</label>
+                    <div class="multi-select" id="diseases">
+                        <span class="placeholder">
+                            {% if user and user.diseases and user.diseases|length %}{{ user.diseases|join(', ') }}{% else %}Select Diseases{% endif %}
+                        </span>
+                        <div class="options">
+                            {% for d in ['None','BP','Diabetes','Heart Disease','Cancer','Asthma','Stroke'] %}
+                            <label>{{ d }}<input type="checkbox" name="diseases" value="{{ d }}" {% if user and d in user.diseases %}checked{% endif %}></label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Family History</label>
+                    <div class="multi-select" id="family_history">
+                        <span class="placeholder">
+                            {% if user and user.family_history and user.family_history|length %}{{ user.family_history|join(', ') }}{% else %}Select Family History{% endif %}
+                        </span>
+                        <div class="options">
+                            {% for d in ['None','Diabetes','BP','Cancer','Stroke','Heart Disease'] %}
+                            <label>{{ d }}<input type="checkbox" name="family_history" value="{{ d }}" {% if user and d in user.family_history %}checked{% endif %}></label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Disability</label>
+                    <select name="disability">
+                        <option value="" disabled>Select Option</option>
+                        <option value="Yes" {% if user and user.disability=='Yes' %}selected{% endif %}>Yes</option>
+                        <option value="No" {% if user and user.disability=='No' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Surgeries</label>
+                    <select name="surgeries">
+                        <option value="" disabled>Select Option</option>
+                        <option value="Yes" {% if user and user.surgeries=='Yes' %}selected{% endif %}>Yes</option>
+                        <option value="No" {% if user and user.surgeries=='No' %}selected{% endif %}>No</option>
+                    </select>
+                </div>
+                <div class="section">
+                    <h3>Occupational Details</h3>
+                    <div class="input-group"><label>Salary (₹)</label><input type="number" name="salary" value="{{ user.salary }}"></div>
+                    <div class="input-group">
+                        <label>Occupation</label>
+                        <select name="occupation">
+                            <option value="" disabled>Select Occupation</option>
+                            <option value="Sedentary" {% if user and user.occupation=='Sedentary' %}selected{% endif %}>Sedentary</option>
+                            <option value="Moderate" {% if user and user.occupation=='Moderate' %}selected{% endif %}>Moderate</option>
+                            <option value="High-risk" {% if user and user.occupation=='High-risk' %}selected{% endif %}>High-risk</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="btn-container">
+                    <button type="submit">Save Profile</button>
+                </div>
+        </form>
+    </div>
+    <script>
+        document.querySelectorAll('.multi-select').forEach(ms => {
+            const placeholder = ms.querySelector('.placeholder');
+            const checkboxes = ms.querySelectorAll('input[type="checkbox"]');
+            ms.addEventListener('click', e => { if (!e.target.closest('.options')) ms.classList.toggle('active'); });
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    if (cb.value === 'None' && cb.checked) checkboxes.forEach(c => { if (c !== cb) c.checked = false; });
+                    else if (cb.checked) checkboxes.forEach(c => { if (c.value === 'None') c.checked = false; });
+                    const selected = Array.from(checkboxes).filter(c => c.checked).map(c => c.value);
+                    placeholder.textContent = selected.length ? selected.join(', ') : 'Select Options';
+                });
+            });
+            document.addEventListener('click', e => { if (!ms.contains(e.target)) ms.classList.remove('active'); });
+        });
+    </script>
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("light");
+            document.body.classList.toggle("dark");
+            document.querySelector(".theme-toggle").textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const body = document.body;
+            const toggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.className = savedTheme;
+            toggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+            toggle.addEventListener('click', () => {
+                body.classList.toggle('dark');
+                body.classList.toggle('light');
+                const newTheme = body.classList.contains('dark') ? 'dark' : 'light';
+                toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+                localStorage.setItem('theme', newTheme);
+            });
+        });
+    </script>
+</body>
+</html>

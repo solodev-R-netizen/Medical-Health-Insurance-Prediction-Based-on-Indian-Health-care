@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; transition: background-color 0.4s, color 0.4s; }
+        .login-container { background: #fff; padding: 40px 30px; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.25); width: 350px; text-align: center; }
+        h2 { margin-bottom: 30px; font-weight: 600; letter-spacing: 0.5px; }
+        .input-group { position: relative; margin: 20px 0; }
+        .input-group input { width: 100%; padding: 14px 12px; border-radius: 10px; border: 1px solid #ccc; background: #f9f9f9; color: #333; font-size: 16px; outline: none; transition: all 0.3s; font-family: 'Poppins', sans-serif; }
+        .input-group label { position: absolute; top: 50%; left: 12px; transform: translateY(-50%); background: transparent; color: #888; font-size: 16px; pointer-events: none; transition: 0.3s; font-family: 'Poppins', sans-serif; }
+        .input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { top: -8px; left: 10px; font-size: 12px; background: #fff; padding: 0 4px; color: #ff7a00; }
+        button { width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 12px; font-size: 16px; cursor: pointer; background: linear-gradient(45deg, #ff7a00, #ffb347); color: #fff; transition: 0.3s; font-weight: 500; }
+        button:hover { opacity: 0.9; }
+        .theme-toggle { margin-top: 20px; background: none; border: none; color: #ff7a00; cursor: pointer; font-size: 14px; text-decoration: underline; font-family: 'Poppins', sans-serif; }
+        body.dark-mode { background-color: #121212; color: #eee; }
+        body.dark-mode .login-container { background: #1f1f1f; color: #eee; }
+        body.dark-mode .input-group input { background: #2a2a2a; color: #eee; }
+        body.dark-mode .input-group label { color: #bbb; }
+        body.dark-mode .input-group input:focus + label, body.dark-mode .input-group input:not(:placeholder-shown) + label { background: #1f1f1f; color: #ff7a00; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        {% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+        <form method="post" action="/login">
+            <div class="input-group">
+                <input type="text" name="username" placeholder=" " required>
+                <label>Username</label>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder=" " required>
+                <label>Password</label>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        <button class="theme-toggle" id="themeToggle">Toggle Dark/Light Mode</button>
+    </div>
+    <script>
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.body.classList.add(currentTheme + '-mode');
+        const toggleButton = document.getElementById('themeToggle');
+        toggleButton.addEventListener('click', () => {
+            if (document.body.classList.contains('light-mode')) {
+                document.body.classList.replace('light-mode', 'dark-mode');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.replace('dark-mode', 'light-mode');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
+register.html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 0; min-height: 100vh; background: linear-gradient(to bottom, white, #ddd); color: #222; transition: background 0.4s, color 0.4s; }
+        body.dark { background: linear-gradient(to bottom, #222, #111); color: #eee; }
+        .theme-toggle { position: fixed; top: 15px; right: 20px; cursor: pointer; font-size: 24px; z-index: 100; }
+
+        
+        .login-container {
+            background: #fff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            width: 350px;
+            text-align: center;
+            margin: 60px auto 0 auto;
+        }
+        .login-container h2 { margin-bottom: 30px; font-weight: 600; letter-spacing: 0.5px; }
+        .input-group-login { position: relative; margin: 20px 0; }
+        .input-group-login input {
+            width: 100%; padding: 14px 12px; border-radius: 10px; border: 1px solid #ccc;
+            background: #f9f9f9; color: #333; font-size: 16px; outline: none; transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        .input-group-login label {
+            position: absolute; top: 50%; left: 12px; transform: translateY(-50%);
+            background: transparent; color: #888; font-size: 16px; pointer-events: none;
+            transition: 0.3s; font-family: 'Poppins', sans-serif;
+        }
+        .input-group-login input:focus + label,
+        .input-group-login input:not(:placeholder-shown) + label {
+            top: -8px; left: 10px; font-size: 12px; background: #fff; padding: 0 4px; color: #4CAF50;
+        }
+        .login-container button {
+            width: 100%; padding: 14px; margin-top: 10px; border: none; border-radius: 12px;
+            font-size: 16px; cursor: pointer; background: linear-gradient(45deg, #ff7a00, #ffb347);
+            color: #fff; transition: 0.3s; font-weight: 500;
+        }
+        .login-container button:hover,
+        .register-box .btn-step:hover {
+            background: linear-gradient(90deg, #43ea7d, #3bd16d);
+            color: #fff;
+        }
+        .login-container .btn-back { background: #bbb; color: #222; margin-top: 10px; }
+        .login-container .btn-back:hover { background: #888; color: #fff; }
+        .login-container .error-msg { color: red; margin-bottom: 10px; }
+        .login-container .to-login { margin-top: 15px; display: block; color: #ff7a00; text-decoration: underline; }
+        .input-group-login .validation-msg {
+            color: red;
+            font-size: 13px;
+            text-align: left;
+            margin-top: 4px;
+            margin-left: 2px;
+        }
+        body.dark .input-group-login input:focus + label,
+        body.dark .input-group-login input:not(:placeholder-shown) + label {
+            background: #333; 
+            color: #4CAF50; 
+        }
+        
+        .register-box { width: 90%; max-width: 900px; margin: 20px auto; padding: 30px; background: rgba(255,255,255,0.06); border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; }
+        .step { display: none; }
+        .step.active { display: block; }
+        .input-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+        .input-group label { font-weight: 500; margin-bottom: 5px; transition: color 0.3s; }
+        .input-group input, .input-group select { padding: 10px 12px; border-radius: 8px; border: 1px solid #aaa; outline: none; font-size: 15px; width: 100%; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
+        .input-group.filled label { color: #4CAF50; }
+        .input-group.filled input, .input-group.filled select { border-color: #4CAF50; box-shadow: 0 0 6px #4CAF50; }
+        .btn-container { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; }
+        .btn-step {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: linear-gradient(45deg, #ff7a00, #ffb347);
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s, color 0.3s;
+            margin-top: 0;
+        }
+        .btn-step:hover {
+            background: linear-gradient(90deg, #43ea7d, #3bd16d);
+            color: #fff;
+        }
+
+        .section h3 {
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+            color: #333;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .section.completed h3 {
+            color: #4CAF50 !important;
+            border-bottom: 2px solid #4CAF50;
+        }
+
+        
+        .checkbox-card {
+            border: 2.5px solid #888;
+            border-radius: 12px;
+            background: #f2f2f2;
+            margin-bottom: 10px;
+            margin-top: 5px;
+            padding: 14px 18px 8px 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.10);
+            transition: border-color 0.3s;
+        }
+        .checkbox-card.selected {
+            border-color: #4CAF50;
+        }
+        .checkbox-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .checkbox-grid label { min-width: 140px; display: flex; align-items: center; padding: 4px 0; font-weight: 500; }
+
+        .multi-select { border: none; background: none; padding: 0; user-select: auto; cursor: auto; }
+        .multi-select .placeholder, .multi-select .options { display: none !important; }
+        .multi-select .checkbox-grid { display: flex !important; }
+        body.dark .login-container {
+            background: #333;
+            color: #eee;
+        }
+    </style>
+</head>
+<body class="light">
+
+    <div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+    <form id="registerForm" action="/register" method="POST" autocomplete="off">
+        <!-- Step 1 -->
+        <div class="step active" id="step1">
+            <div class="login-container">
+                <h2>Register</h2>
+                {% if error %}<div class="error-msg">{{ error }}</div>{% endif %}
+                <div class="input-group-login">
+                    <input type="text" name="username" id="username" required placeholder=" " autocomplete="off" pattern="^(?=.*[A-Za-z]).{5,}$">
+                    <label for="username">Username</label>
+                    <div class="validation-msg" id="username-validate"></div>
+                </div>
+                <div class="input-group-login">
+                    <input type="password" name="password" id="password" required placeholder=" " minlength="8">
+                    <label for="password">Password</label>
+                    <div class="validation-msg" id="password-validate"></div>
+                </div>
+                <div class="input-group-login">
+                    <input type="password" name="confirm_password" id="confirm_password" required placeholder=" ">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="validation-msg" id="confirm-validate"></div>
+                </div>
+                <button type="button" id="nextBtn" onclick="validateStep1()">Next</button>
+                <a href="/login" class="to-login">⬅ Back to Login</a>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="register-box step" id="step2">
+            <div class="section" id="section-personal">
+                <h3>Personal Details</h3>
+                <div class="input-group" id="group-name"><label for="name">Full Name</label><input type="text" name="name" id="name" required></div>
+                <div class="input-group" id="group-age"><label for="age">Age</label><input type="number" name="age" id="age" required></div>
+                <div class="input-group" id="group-gender">
+                    <label for="gender">Gender</label>
+                    <select name="gender" id="gender" required>
+                        <option value="" disabled selected>Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-height"><label for="height">Height (cm)</label><input type="number" name="height" id="height" step="0.1" required></div>
+                <div class="input-group" id="group-weight"><label for="weight">Weight (kg)</label><input type="number" name="weight" id="weight" step="0.1" required></div>
+                <div class="input-group" id="group-marital_status">
+                    <label for="marital_status">Marital Status</label>
+                    <select name="marital_status" id="marital_status" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-region">
+                    <label for="region">Region</label>
+                    <select name="region" id="region" required>
+                        <option value="" disabled selected>Select Region</option>
+                        <option value="Metro">Metro</option>
+                        <option value="Tier-2">Tier-2</option>
+                        <option value="Rural">Rural</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section" id="section-health">
+                <h3>Health Details</h3>
+                <div class="input-group" id="group-exercise">
+                    <label for="exercise">Exercise Level</label>
+                    <select name="exercise" id="exercise" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-alcohol">
+                    <label for="alcohol">Alcohol Consumption</label>
+                    <select name="alcohol" id="alcohol" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="None">None</option>
+                        <option value="Occasional">Occasional</option>
+                        <option value="Frequent">Frequent</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-smoker">
+                    <label for="smoker">Smoker</label>
+                    <select name="smoker" id="smoker" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-diseases">
+                    <label for="diseases">Diseases</label>
+                    <div class="multi-select checkbox-card" id="diseases-card">
+                        <div class="checkbox-grid">
+                            <label><input type="checkbox" name="diseases" value="None"> None</label>
+                            <label><input type="checkbox" name="diseases" value="BP"> BP</label>
+                            <label><input type="checkbox" name="diseases" value="Diabetes"> Diabetes</label>
+                            <label><input type="checkbox" name="diseases" value="Heart Disease"> Heart Disease</label>
+                            <label><input type="checkbox" name="diseases" value="Cancer"> Cancer</label>
+                            <label><input type="checkbox" name="diseases" value="Asthma"> Asthma</label>
+                            <label><input type="checkbox" name="diseases" value="Stroke"> Stroke</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group" id="group-family_history">
+                    <label for="family_history">Family History</label>
+                    <div class="multi-select checkbox-card" id="family-card">
+                        <div class="checkbox-grid">
+                            <label><input type="checkbox" name="family_history" value="None"> None</label>
+                            <label><input type="checkbox" name="family_history" value="Diabetes"> Diabetes</label>
+                            <label><input type="checkbox" name="family_history" value="BP"> BP</label>
+                            <label><input type="checkbox" name="family_history" value="Cancer"> Cancer</label>
+                            <label><input type="checkbox" name="family_history" value="Stroke"> Stroke</label>
+                            <label><input type="checkbox" name="family_history" value="Heart Disease"> Heart Disease</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group" id="group-disability">
+                    <label for="disability">Disability</label>
+                    <select name="disability" id="disability" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-surgeries">
+                    <label for="surgeries">Surgeries</label>
+                    <select name="surgeries" id="surgeries" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="Yes">Yes</option>
+                        <option value="No">No</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section" id="section-occupational">
+                <h3>Occupational Details</h3>
+                <div class="input-group" id="group-salary"><label for="salary">Salary (₹)</label><input type="number" name="salary" id="salary" required></div>
+                <div class="input-group" id="group-occupation">
+                    <label for="occupation">Occupation</label>
+                    <select name="occupation" id="occupation" required>
+                        <option value="" disabled selected>Select Occupation</option>
+                        <option value="Sedentary">Sedentary</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High-risk">High-risk</option>
+                    </select>
+                </div>
+                <div class="input-group" id="group-claim_history">
+                    <label for="claim_history">Claim History</label>
+                    <select name="claim_history" id="claim_history" required>
+                        <option value="" disabled selected>Select Option</option>
+                        <option value="Never">Never</option>
+                        <option value="Frequent">Frequent</option>
+                    </select>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn-step" onclick="prevStep()">Back</button>
+                <button type="submit" class="btn-step">Register</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("light");
+            document.body.classList.toggle("dark");
+            document.querySelector(".theme-toggle").textContent =
+                document.body.classList.contains("dark") ? "☀️" : "🌙";
+        }
+      
+        function nextStep() {
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function prevStep() {
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function checkUsernameValidity() {
+            const el = document.getElementById('username');
+            const msg = document.getElementById('username-validate');
+            const val = el.value;
+            if (val.length < 5) {
+                msg.textContent = "Must be at least 5 characters.";
+                return false;
+            }
+            if (!/[A-Za-z]/.test(val)) {
+                msg.textContent = "Must contain at least one alphabet.";
+                return false;
+            }
+            msg.textContent = "";
+            return true;
+        }
+        function checkPasswordValidity() {
+            const el = document.getElementById('password');
+            const msg = document.getElementById('password-validate');
+            if (el.value.length < 8) {
+                msg.textContent = "Minimum 8 characters required.";
+                return false;
+            }
+            msg.textContent = "";
+            return true;
+        }
+        function checkConfirmPassword() {
+            const pwd = document.getElementById('password').value;
+            const confirm = document.getElementById('confirm_password').value;
+            const msg = document.getElementById('confirm-validate');
+            if (pwd !== confirm) {
+                msg.textContent = "Passwords do not match.";
+                return false;
+            }
+            msg.textContent = "";
+            return true;
+        }
+        document.getElementById('username').addEventListener('input', checkUsernameValidity);
+        document.getElementById('password').addEventListener('input', checkPasswordValidity);
+        document.getElementById('confirm_password').addEventListener('input', checkConfirmPassword);
+
+        function validateStep1() {
+            let valid = true;
+            if (!checkUsernameValidity()) valid = false;
+            if (!checkPasswordValidity()) valid = false;
+            if (!checkConfirmPassword()) valid = false;
+            if (!valid) return;
+            nextStep();
+        }
+
+        
+        const sectionFields = {
+            personal: [
+                'name','age','gender','height','weight','marital_status','region'
+            ],
+            health: [
+                'exercise','alcohol','smoker','diseases','family_history','disability','surgeries'
+            ],
+            occupational: [
+                'salary','occupation','claim_history'
+            ]
+        };
+
+        function updateInputGroupState(groupId, isFilled) {
+            const group = document.getElementById(groupId);
+            if (group) group.classList.toggle('filled', !!isFilled);
+        }
+        function updateSectionHighlight(sectionId, fields, isCheckboxGroup=false) {
+            let allFilled = true;
+            fields.forEach(field => {
+                if (['diseases','family_history'].includes(field)) {
+                  
+                    const grid = document.querySelector(`#group-${field} .checkbox-grid`);
+                    if (!grid || grid.querySelectorAll('input[type="checkbox"]:checked').length === 0) allFilled = false;
+                } else {
+                    const el = document.getElementsByName(field)[0];
+                    if (!el || !el.value || el.value === "") allFilled = false;
+                }
+            });
+            const section = document.getElementById(`section-${sectionId}`);
+            if (section) section.classList.toggle('completed', allFilled);
+        }
+
+        document.querySelectorAll('#step2 .input-group input, #step2 .input-group select').forEach(input => {
+            input.addEventListener('input', function() {
+                updateInputGroupState('group-' + this.name, this.value && this.value !== "");
+                updateSectionHighlight('personal', sectionFields.personal);
+                updateSectionHighlight('health', sectionFields.health);
+                updateSectionHighlight('occupational', sectionFields.occupational);
+            });
+        });
+   
+        document.querySelectorAll('#step2 .checkbox-grid input[type="checkbox"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const group = this.closest('.checkbox-grid');
+                const card = this.closest('.checkbox-card');
+                if (this.value === "None" && this.checked) {
+                    group.querySelectorAll('input[type="checkbox"]').forEach(c => { if (c !== this) c.checked = false; });
+                } else if (this.checked) {
+                    group.querySelectorAll('input[type="checkbox"]').forEach(c => { if (c.value === "None") c.checked = false; });
+                }
+                const inputGroup = this.closest('.input-group');
+                const anyChecked = group.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+                if (inputGroup) inputGroup.classList.toggle('filled', anyChecked);
+                if (card) card.classList.toggle('selected', anyChecked);
+                updateSectionHighlight('health', sectionFields.health);
+            });
+        });
+       
+        window.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('#step2 .input-group input, #step2 .input-group select').forEach(input => {
+                updateInputGroupState('group-' + input.name, input.value && input.value !== "");
+            });
+            document.querySelectorAll('#step2 .checkbox-grid').forEach(group => {
+                const inputGroup = group.closest('.input-group');
+                const card = group.closest('.checkbox-card');
+                const anyChecked = group.querySelectorAll('input[type="checkbox"]:checked').length > 0;
+                if (inputGroup) inputGroup.classList.toggle('filled', anyChecked);
+                if (card) card.classList.toggle('selected', anyChecked);
+            });
+           
+            updateSectionHighlight('personal', sectionFields.personal);
+            updateSectionHighlight('health', sectionFields.health);
+            updateSectionHighlight('occupational', sectionFields.occupational);
+        });
+    </script>
+</body>
+</html>

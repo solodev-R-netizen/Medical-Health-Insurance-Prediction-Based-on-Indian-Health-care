@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+         body { font-family: 'Poppins', sans-serif; margin: 0; min-height: 100vh; background: white; color: #222; transition: background 0.4s, color 0.4s; }
+        .filter-input { margin-bottom: 20px; }
+        .card { padding: 15px; margin-bottom: 20px; }
+        body.dark-mode { background-color: #474747 !important; color: #e0e0e0 !important; }
+        body.dark-mode .card { background-color: #1e1e1e !important; color: #e0e0e0 !important; }
+        body.dark-mode nav { background-color: #1b1b1b !important; }
+        body.dark-mode table.striped > tbody > tr { background-color: #1e1e1e !important; color: #a1a1a1 !important; }
+        body.dark-mode .collection-item { background-color: #1e1e1e !important; color: #e0e0e0 !important; }
+        body.dark-mode input, body.dark-mode select { background-color: #333 !important; color: #ccc !important; }
+        body.dark-mode nav .brand-logo, body.dark-mode nav .white-text, body.dark-mode nav a { color: #ccc !important; }
+        .nav-gradient { background: linear-gradient(90deg, #ff9800, #ff5722); }
+      
+    </style>
+</head>
+<body>
+    <nav class="nav-gradient">
+        <div class="nav-wrapper container">
+            <a href="" class="brand-logo">Admin Dashboard</a>
+            <ul class="right">
+                
+                <li><a href="#" id="themeToggle">🌙 </a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container" style="margin-top:30px;">
+        <div class="card grey lighten-4">
+            <h5>User Details & Active Users</h5>
+            <p>Total Users: {{ total_users }}</p>
+            <p>Active Users: {{ active_users }}</p>
+            {% if users %}
+            <ul class="collection">
+                {% for user in users %}
+                <li class="collection-item tooltipped" data-position="top"
+                    data-tooltip="Age: {{ user[3] }} | Height: {{ user[4] }}  | Weight: {{ user[5] }} | Claim History: {{ user[6] }} | Gender: {{ user[7] }} | Marital Status: {{ user[8] }} | Region: {{ user[9] }} <br> Salary: {{ user[10] }} | Occupation: {{ user[11] }} | Alcohol: {{ user[12] }} | Smoker: {{ user[13] }} | Exercise: {{ user[14] }} | Diseases: {{ user[15] }} | Family History: {{ user[16] }} | Disability: {{ user[17] }} | Surgeries: {{ user[18] }}">
+
+                    <b><i>ID:</i></b> {{ user[0] }} &nbsp; &nbsp;&nbsp;<b><i>Username:</i></b> {{ user[1] }}  &nbsp;&nbsp;&nbsp;  <b><i>Name:</i></b> {{ user[2] }}
+                    <form method="post" action="{{ url_for('remove_user') }}" style="display:inline; float:right; margin:0;">
+                        <input type="hidden" name="user_id" value="{{ user[0] }}">
+                        <button type="submit" class="btn-small red" onclick="return confirm('Are you sure you want to remove this user?');">Remove</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No users registered.</p>
+            {% endif %}
+        </div>
+        <div class="card grey lighten-4">
+            <h5>Company Multipliers</h5>
+            <form method="post" action="/update_multipliers">
+                <div class="row">
+                    {% for comp, factor in company_factors.items() %}
+                    <div class="input-field col s6 m4">
+                        <input type="number" step="0.01" name="{{ comp }}" value="{{ factor }}">
+                        <label class="active">{{ comp }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn orange darken-2">Update Multipliers</button>
+            </form>
+        </div>
+        <div class="card grey lighten-4">
+            <h5>Analytics Charts</h5>
+            <canvas id="companyPremiumChart"></canvas>
+            <canvas id="policyTypeChart" style="margin-top: 30px; max-width: 500px; max-height: 500px;"></canvas>
+            <canvas id="ageDistributionChart" style="margin-top:30px;"></canvas>
+            <canvas id="premiumDistributionChart" style="margin-top:30px;"></canvas>
+        </div>
+        <div class="card grey lighten-1">
+
+
+            <h5>All Submissions (By User)</h5>
+            {% if users %}
+            {% for user in users %}
+            <div style="margin-bottom: 32px;">
+                <h6 style="font-weight:600;">
+                    User: {{ user[2] }} (ID: {{ user[0] }}  Username: {{ user[1] }})
+                </h6>
+                {% set found = false %}
+                <div style="overflow-x:auto;">
+                    <table class="striped user-submissions-table" style="margin-bottom:8px;">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Sum Insured</th>
+                                <th>Policy Term</th>
+                                <th>Policy Type</th>
+                                <th>Dependents</th>
+                                <th>Add-ons</th>
+                                <th>Company</th>
+                                <th>Premium</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in submissions %}
+                            {% if row[1] == user[0] %}
+                            {% set found = true %}
+                            <tr>
+                                <td>{{ row[0] }}</td>
+                                <td>{{ row[1] }}</td>
+                                <td>{{ row[2] }}</td>
+                                <td>{{ row[3] }}</td>
+                                <td>{{ row[4] }}</td>
+                                <td>{{ row[5] }}</td>
+                                <td>{{ row[6] }}</td>
+                                <td>{{ row[7] }}</td>
+                                <td>{{ row[8] }}</td>
+                                <td>{{ row[9] }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                            {% if not found %}
+                            <tr>
+                                <td colspan="10" class="center-align"></td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No users registered.</p>
+            {% endif %}
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            const filterInput = document.getElementById('filterInput');
+            filterInput.addEventListener('keyup', function () {
+                const filter = filterInput.value.toLowerCase();
+                const rows = document.querySelectorAll('#submissionsTable tbody tr');
+                rows.forEach(row => {
+                    const cells = Array.from(row.cells);
+                    const matches = cells.some(cell => cell.textContent.toLowerCase().includes(filter));
+                    row.style.display = matches ? '' : 'none';
+                });
+            });
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+   
+        var elems = document.querySelectorAll('.tooltipped');
+            M.Tooltip.init(elems, {
+                enterDelay: 200,   
+            margin: 5,         
+        });
+});
+        </script>
+
+
+        </script>
+
+        <script>
+        const companyLabels = {{ company_trends.keys() | list | tojson }};
+        const companyData = {{ company_trends.values() | list | tojson }};
+        const policyLabels = {{ policy_trends.keys() | list | tojson }};
+        const policyData = {{ policy_trends.values() | list | tojson }};
+        const ageLabels = {{ age_distribution.keys() | list | tojson }};
+        const ageData = {{ age_distribution.values() | list | tojson }};
+        const premiumLabels = {{ premium_distribution.keys() | list | tojson }};
+        const premiumData = {{ premium_distribution.values() | list | tojson }};
+        new Chart(document.getElementById('companyPremiumChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: companyLabels, datasets: [{ label: 'Average Premium', data: companyData, backgroundColor: 'rgba(33,150,243,0.7)', borderColor: 'rgba(33,150,243,1)', borderWidth: 1 }] },
+            options: { responsive:true, plugins: { legend: { display:false } } }
+        });
+        new Chart(document.getElementById('policyTypeChart').getContext('2d'), {
+            type: 'pie',
+            data: { labels: policyLabels, datasets: [{ data: policyData, backgroundColor: ['#2196F3','#4CAF50','#FFC107','#FF5722','#9C27B0'] }] },
+            options: { responsive: true }
+        });
+        new Chart(document.getElementById('ageDistributionChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: ageLabels, datasets: [{ label: 'Number of Users', data: ageData, backgroundColor: 'rgba(76,175,80,0.7)', borderColor: 'rgba(76,175,80,1)', borderWidth: 1 }] },
+            options: { responsive:true, plugins: { legend: { display:false } } }
+        });
+        new Chart(document.getElementById('premiumDistributionChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: premiumLabels, datasets: [{ label: 'Number of Submissions', data: premiumData, backgroundColor: 'rgba(255,152,0,0.7)', borderColor: 'rgba(255,152,0,1)', borderWidth: 1 }] },
+            options: { responsive:true, plugins: { legend: { display:false } } }
+        });
+        </script>
+        <script>
+            const toggleBtn = document.getElementById('themeToggle');
+            function applyTheme() {
+                            const theme = localStorage.getItem('theme') || 'light';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            toggleBtn.textContent = '☀️ ';
+                            } else {
+                document.body.classList.remove('dark-mode');
+            toggleBtn.textContent = '🌙 ';
+                            }
+                        }
+            applyTheme();
+                        toggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+            if (document.body.classList.contains('dark-mode')) {
+                toggleBtn.textContent = '☀️ ';
+            localStorage.setItem('theme', 'dark');
+                            } else {
+                toggleBtn.textContent = '🌙 ';
+            localStorage.setItem('theme', 'light');
+                            }
+                        });
+        </script>
+</body>
+</html>

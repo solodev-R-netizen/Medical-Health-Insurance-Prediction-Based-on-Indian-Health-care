@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Premium Estimator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; transition: background 0.3s, color 0.3s; }
+        nav { background: linear-gradient(90deg, #ff9800, #ff5722); }
+        .container { margin-top: 30px; }
+        .card { padding: 20px; border-radius: 12px; transition: background 0.3s, color 0.3s; }
+        .company-tile { background: linear-gradient(135deg, #ff9800, #ff5722); color: white; border-radius: 10px; padding: 15px; margin: 10px 0; }
+        body.light { background: linear-gradient(to bottom, #ffffff, #f1f1f1); color: #333; }
+        body.light .card { background: #ebedf0; color: #333; }
+        body.dark { background: #121212; color: #eee; }
+        body.dark .card { background: linear-gradient(135deg, #2c2c2c, #3a3a3a); color: #eee; }
+        .theme-toggle { cursor: pointer; font-size: 1.3rem; margin-right: 15px; }
+        .profile-link { display: flex; align-items: center; }
+        .profile-link img { border-radius: 50%; width: 30px; height: 30px; margin-right: 8px; }
+    </style>
+</head>
+<body class="light">
+    <nav>
+        <div class="nav-wrapper">
+            <ul class="left">
+                <li>
+                    <a href="{{ url_for('profile') }}" class="profile-link">
+                        <img src="{{ url_for('static', filename='profile.jpg') }}" alt="Profile">
+                        Profile
+                    </a>
+                </li>
+            </ul>
+            <a href="#" class="brand-logo center">Medical Insurance Estimate Calculator</a>
+            <ul class="right">
+                <li>
+                    <a id="theme-toggle" class="theme-toggle">☀️</a>
+                </li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h5>Welcome, {{ name }}</h5>
+        <div class="card why-card">
+            <h5>Why Medical Insurance is Important?</h5>
+            <p>
+                Medical insurance is important because it provides financial protection, access to healthcare, and peace of mind during times of illness or injury. With the rising cost of medical treatments, hospitalizations, and surgeries, a sudden health emergency can drain savings or even push families into debt. Having medical insurance ensures that such expenses are covered without creating a financial burden. Many insurers also provide cashless treatment facilities in partner hospitals, which allows patients to receive care without having to pay upfront, as the insurer directly settles the bills with the hospital.
+
+In addition to covering hospitalization, medical insurance often includes day-care procedures, ambulance charges, preventive checkups, and in some cases, maternity expenses or critical illness coverage. This makes it a comprehensive safety net against various health risks. It also helps individuals cope with rising healthcare costs, ensuring access to quality treatment even when medical inflation increases expenses year after year. Another advantage is that premiums paid towards medical insurance often qualify for tax benefits under provisions such as Section 80D of the Income Tax Act in India, reducing the overall financial burden on the insured.
+
+Most importantly, medical insurance offers peace of mind by assuring individuals and their families that they are financially protected in the face of medical emergencies. Instead of worrying about how to afford treatment, they can focus on recovery and well-being. In short, medical insurance is not just an expense but a crucial investment that safeguards health, finances, and the future security of loved ones.
+            </p>
+        </div>
+        <div class="card">
+            <h5>Enter Policy Details</h5>
+            <form method="POST" action="{{ url_for('predict') }}" class="row">
+                <div class="input-field col s6">
+                    <input type="number" name="sum_insured" id="sum_insured" min="1000" max="10000000" step="10" required value="{{ user_inputs.get('sum_insured','') }}">
+                    <label for="sum_insured">Sum Insured</label>
+                </div>
+                <div class="input-field col s6">
+                    <input type="number" name="policy_term" id="policy_term" min="1" max="40" step="1" required value="{{ user_inputs.get('policy_term','') }}">
+                    <label for="policy_term">Policy Term (years)</label>
+                </div>
+                <div class="input-field col s4">
+                    <select name="add_ons" required>
+                        <option value="" disabled {% if not user_inputs.get('add_ons') %}selected{% endif %}>Choose</option>
+                        <option value="None" {% if user_inputs.get('add_ons')=='None' %}selected{% endif %}>None</option>
+                        <option value="Room Rent" {% if user_inputs.get('add_ons')=='Room Rent' %}selected{% endif %}>Room Rent</option>
+                        <option value="Accident" {% if user_inputs.get('add_ons')=='Accident' %}selected{% endif %}>Accident</option>
+                        <option value="Maternity" {% if user_inputs.get('add_ons')=='Maternity' %}selected{% endif %}>Maternity</option>
+                        <option value="Critical Illness" {% if user_inputs.get('add_ons')=='Critical Illness' %}selected{% endif %}>Critical Illness</option>
+                        <option value="Ambulance" {% if user_inputs.get('add_ons')=='Ambulance' %}selected{% endif %}>Ambulance</option>
+                    </select>
+                    <label>Add-ons</label>
+                </div>
+                <div class="input-field col s6">
+                    <select name="policy_type" required>
+                        <option value="" disabled {% if not user_inputs.get('policy_type') %}selected{% endif %}>Choose</option>
+                        <option value="Individual" {% if user_inputs.get('policy_type')=='Individual' %}selected{% endif %}>Individual</option>
+                        <option value="1 Family" {% if user_inputs.get('policy_type')=='1 Family' %}selected{% endif %}>1 Family</option>
+                        <option value="2 Family" {% if user_inputs.get('policy_type')=='2 Family' %}selected{% endif %}>2 Family</option>
+                        <option value="3 Family" {% if user_inputs.get('policy_type')=='3 Family' %}selected{% endif %}>3 Family</option>
+                        <option value="Corporate" {% if user_inputs.get('policy_type')=='Corporate' %}selected{% endif %}>Corporate</option>
+                    </select>
+                    <label>Policy Type</label>
+                </div>
+                <div class="input-field col s6">
+                    <input type="number" name="dependents" id="dependents" min="0" max="300" step="1" required value="{{ user_inputs.get('dependents','') }}">
+                    <label for="dependents">Dependents</label>
+                </div>
+                <div class="input-field col s6">
+                    <select name="company" required>
+                        <option value="" disabled {% if not user_inputs.get('company') %}selected{% endif %}>Choose Insurance Company</option>
+                        <option value="HDFC Ergo" {% if user_inputs.get('company')=='HDFC Ergo' %}selected{% endif %}>HDFC Ergo</option>
+                        <option value="ICICI Lombard" {% if user_inputs.get('company')=='ICICI Lombard' %}selected{% endif %}>ICICI Lombard</option>
+                        <option value="Niva Bupa" {% if user_inputs.get('company')=='Niva Bupa' %}selected{% endif %}>Niva Bupa</option>
+                        <option value="Star Health" {% if user_inputs.get('company')=='Star Health' %}selected{% endif %}>Star Health</option>
+                    </select>
+                    <label>Company</label>
+                </div>
+                <div class="col s12">
+                    <button type="submit" class="btn orange darken-3 waves-effect waves-light full-width">Estimate Premium</button>
+                </div>
+            </form>
+        </div>
+        {% if company_premiums %}
+        <div class="row">
+            {% for company, premium in company_premiums.items() %}
+            <div class="col s12 m6">
+                <div class="company-tile">
+                    <h6>{{ company }}</h6>
+                    <p>Annual: ₹{{ premium }}</p>
+                    <p>Monthly: ₹{{ (premium/12)|round(2) }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if user_history %}
+        <div class="card">
+            <h5>Past Predictions</h5>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Sum Insured</th>
+                        <th>Term</th>
+                        <th>Type</th>
+                        <th>Dependents</th>
+                        <th>Premium</th>
+                        <th>Monthly Premium</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in user_history %}
+                    <tr>
+                        <td>{{ row[7] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td>{{ row[4] }}</td>
+                        <td>{{ row[5] }}</td>
+                        <td>₹{{ "%.2f"|format(row[8]) }}</td>
+                        <td>₹{{ "{:,.2f}".format(row[8] / 12) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var elems = document.querySelectorAll('select');
+            M.FormSelect.init(elems);
+            const body = document.body;
+            const toggle = document.getElementById('theme-toggle');
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            body.className = savedTheme;
+            toggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+            toggle.addEventListener('click', () => {
+                body.classList.toggle('dark');
+                body.classList.toggle('light');
+                const newTheme = body.classList.contains('dark') ? 'dark' : 'light';
+                toggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+                localStorage.setItem('theme', newTheme);
+            });
+        });
+    </script>
+</body>
+</html>
